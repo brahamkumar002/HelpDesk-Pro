@@ -1,0 +1,188 @@
+
+# ============================================================
+# HelpDesk Pro - Git Ignore
+# Java 21 | Spring Boot | Maven | React | Vite | MySQL
+# ============================================================
+
+
+# ------------------------------------------------------------
+# 1. Environment Variables & Secrets
+# ------------------------------------------------------------
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+secrets/
+credentials/
+**/secrets/
+**/credentials/
+
+
+# ------------------------------------------------------------
+# 2. Spring Boot / Maven Build Output
+# ------------------------------------------------------------
+
+target/
+**/target/
+
+*.class
+*.jar
+*.war
+*.ear
+
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+hs_err_pid*
+replay_pid*
+
+
+# ------------------------------------------------------------
+# 3. Local Spring Boot Configuration
+# ------------------------------------------------------------
+
+**/application-local.properties
+**/application-local.yml
+**/application-local.yaml
+
+**/application-dev.properties
+**/application-dev.yml
+**/application-dev.yaml
+
+**/application-prod.properties
+**/application-prod.yml
+**/application-prod.yaml
+
+**/application-secrets.properties
+**/application-secrets.yml
+**/application-secrets.yaml
+
+
+# ------------------------------------------------------------
+# 4. Node.js / React / Vite
+# ------------------------------------------------------------
+
+node_modules/
+**/node_modules/
+
+dist/
+**/dist/
+
+.vite/
+**/.vite/
+
+.cache/
+**/.cache/
+
+coverage/
+**/coverage/
+
+*.tsbuildinfo
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# ------------------------------------------------------------
+# 5. IDE / Editor Files
+# ------------------------------------------------------------
+
+.idea/
+*.iml
+
+.vscode/*
+!.vscode/extensions.json
+
+.project
+.classpath
+.settings/
+
+.factorypath
+
+*.code-workspace
+
+
+# ------------------------------------------------------------
+# 6. Operating System Files
+# ------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+*.swp
+*.swo
+*~
+
+
+# ------------------------------------------------------------
+# 7. Logs / Runtime Files
+# ------------------------------------------------------------
+
+*.log
+logs/
+**/logs/
+
+*.pid
+*.pid.lock
+
+tmp/
+temp/
+**/tmp/
+**/temp/
+
+
+# ------------------------------------------------------------
+# 8. Database Backups & Local Data
+# ------------------------------------------------------------
+
+*.sql.gz
+*.sql.zip
+*.dump
+*.bak
+*.backup
+
+database/backups/
+database/dumps/
+database/private/
+
+*.sqlite
+*.sqlite3
+*.db
+
+
+# ------------------------------------------------------------
+# 9. Test / Temporary Artifacts
+# ------------------------------------------------------------
+
+*.tmp
+*.temp
+
+test-results/
+playwright-report/
+
+.nyc_output/
+
+
+# ------------------------------------------------------------
+# 10. Keep Important Project Files
+# ------------------------------------------------------------
+
+# README.md should be committed
+# pom.xml should be committed
+# package.json and lockfiles should be committed
+# Maven wrapper scripts should be committed if present
+# screenshots/ should be committed
+# database/helpdesk_schema.sql should be committed
+# frontend/src/ should be committed
+# backend/src/ should be committed

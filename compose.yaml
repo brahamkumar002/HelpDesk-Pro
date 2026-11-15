@@ -1,0 +1,136 @@
+
+# ==========================================
+# HELPDESK - DOCKER COMPOSE
+# ==========================================
+
+name: helpdesk
+
+# Shared Logging Configuration
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+
+  # ========================================
+  # MySQL Database
+  # ========================================
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:?DB_NAME is required}
+      MYSQL_USER: ${DB_USERNAME:?DB_USERNAME is required}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+    networks:
+      - helpdesk-network
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysql -h 127.0.0.1 -u"$${MYSQL_USER}" -D "$${MYSQL_DATABASE}" -e "SELECT 1" >/dev/null 2>&1'
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+    logging: *default-logging
+    mem_limit: 1g
+
+  # ========================================
+  # Spring Boot Backend
+  # ========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    image: helpdesk-backend:1.0
+    restart: unless-stopped
+
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:?DB_NAME is required}
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+
+      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL:?APP_ADMIN_EMAIL is required}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:?APP_ADMIN_PASSWORD is required}
+      APP_ADMIN_FULL_NAME: ${APP_ADMIN_FULL_NAME:-HelpDesk Admin}
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    networks:
+      - helpdesk-network
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health >/dev/null || exit 1'
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    logging: *default-logging
+    mem_limit: 1g
+
+  # ========================================
+  # React + Nginx Frontend
+  # ========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    image: helpdesk-frontend:1.0
+    restart: unless-stopped
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - helpdesk-network
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'wget -q -O /dev/null http://127.0.0.1/ || exit 1'
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    logging: *default-logging
+    mem_limit: 256m
+
+# ==========================================
+# Custom Docker Network
+# ==========================================
+networks:
+  helpdesk-network:
+    name: helpdesk-network
+    driver: bridge
+
+# ==========================================
+# Persistent MySQL Storage
+# ==========================================
+volumes:
+  mysql-data:
+    name: helpdesk-mysql-data

@@ -35,6 +35,13 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Allow Docker and monitoring systems to check backend health
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/actuator/health",
+                                "/actuator/health/**"
+                        ).permitAll()
+
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/auth/csrf"
